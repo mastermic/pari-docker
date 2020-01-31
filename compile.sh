@@ -1,7 +1,4 @@
-#!/bin/bash
-
-set -e
-
+#set -e
 scheme="$1"
 VERSION="2.11.2"
 TAR="pari-$VERSION.tar.gz"
@@ -20,8 +17,9 @@ wget -nv "$URL"
 #gpg --import /texlive_pgp_keys.asc
 #gpg --verify ./install-tl-unx.tar.gz.sha512.asc
 
-md5sum -c <<< "$MD5"
-tar --strip-components 1 -zxf "$FILE" -C pari
+#echo "$MD5" | md5sum -c - 
+mkdir -p pari
+tar --strip-components 1 -zxf "$TAR" -C pari
 
 echo "==> Compile Pari/GP"
 cd pari

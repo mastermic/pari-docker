@@ -5,16 +5,38 @@ jobs:
   build:
     strategy:
       matrix:
-        scheme: [small, full]
+        scheme: [small] # [small, full]
     name: Build Pari/GP [${{ matrix.scheme }}]
     runs-on: ubuntu-latest
     env:
       SCHEME: ${{ matrix.scheme }}
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-      - name: Publish Image
-        uses: matootie/github-docker@v2.2.1
-        with:
-            imageName: parigp-{{ matrix.scheme }}
-            accessToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build
+        run: |
+           docker build -t parigp-$SCHEME --build-arg scheme=$SCHEME .
+      - name: Test
+        run: |
+           docker run --rm parigp-$SCHEME gp --version
+      - name: Deploy
+        if: github.ref == 'refs/heads/master'
+        run: |
+           #DOCKER_TAG="mastermic/parigp-$SCHEME"
+           GH_TAG="docker.pkg.github.com/mastermic/pari-docker/parigp-$SCHEME"
+           #VERSION="$(date "+%Y%m%d")"
+           #docker tag parigp-$SCHEME ${DOCKER_TAG}:$VERSION
+           #docker tag parigp-$SCHEME ${DOCKER_TAG}:latest
+           #docker tag parigp-$SCHEME ${GH_TAG}:$VERSION
+           
+           docker tag parigp-$SCHEME ${GH_TAG}:latest
+           docker images # $DOCKER_TAG
+
+           echo "$GITHUB_TOKEN" | docker login docker.pkg.github.com --password-stdin --username pascalmolin
+           docker push $GH_TAG
+           #echo "$DOCKER_HUB_TOKEN" | docker login --password-stdin -u #pascalmolin
+           #docker push $DOCKER_TAG
+        env:
+           #DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
