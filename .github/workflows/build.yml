@@ -1,0 +1,20 @@
+name: Build Docker Image
+on: [push]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        scheme: [small, full]
+    name: Build Pari/GP [${{ matrix.scheme }}]
+    runs-on: ubuntu-latest
+    env:
+      SCHEME: ${{ matrix.scheme }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Publish Image
+        uses: matootie/github-docker@v2.2.1
+        with:
+            imageName: parigp-{{ matrix.scheme }}
+            accessToken: ${{ secrets.GITHUB_TOKEN }}
