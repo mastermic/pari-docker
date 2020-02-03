@@ -5,12 +5,11 @@ jobs:
   build:
     strategy:
       matrix:
-        scheme: [small] # [small, full]
+        scheme: [small, full]
     name: Build Pari/GP [${{ matrix.scheme }}]
     runs-on: ubuntu-latest
     env:
       SCHEME: ${{ matrix.scheme }}
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2

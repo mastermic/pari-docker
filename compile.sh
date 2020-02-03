@@ -1,5 +1,5 @@
 set -e
-scheme="$1"
+scheme="$1" #
 VERSION="2.11.2"
 TAR="pari-$VERSION.tar.gz"
 URL="https://pari.math.u-bordeaux.fr/pub/pari/unix/$TAR"
@@ -21,17 +21,27 @@ wget -nv "$URL"
 mkdir -p pari
 tar --strip-components 1 -zxf "$TAR" -C pari
 
-echo "==> Compile Pari/GP"
 cd pari
-./Configure
-make gp
-make install
 
+# Install additional packages for full scheme
+if [ "$scheme" == "full" ]; then
+    echo "==> Get additional packages"
+    wget -nv https://pari.math.u-bordeaux.fr/pub/pari/packages/seadata.tgz
+    tar xzf seadata.tgz
+    wget -nv https://pari.math.u-bordeaux.fr/pub/pari/packages/galpol.tgz
+    tar xzf galpol.tgz
+    wget -nv https://pari.math.u-bordeaux.fr/pub/pari/packages/galdata.tgz
+    tar xzf galdata.tgz
+    wget -nv https://pari.math.u-bordeaux.fr/pub/pari/packages/elldata.tgz
+    tar xzf elldata.tgz
+fi
+echo "==> Compile Pari/GP"
+./Configure
+make -j gp
+make install
 echo "==> Done"
 
-# Install additional packages for non full scheme
-if [ "$scheme" != "full" ]; then
-    echo "NIY"
-fi
-
 echo "==> Clean up"
+cd /tmp
+rm -rf pari
+rm $TAR
