@@ -6,3 +6,5 @@ ARG scheme=full
 COPY compile.sh /
 
 RUN /compile.sh ${scheme}
+
+#ENTRYPOINT [ "gp" ]

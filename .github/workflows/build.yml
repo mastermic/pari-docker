@@ -17,26 +17,27 @@ jobs:
       - name: Build
         run: |
            docker build -t parigp-$SCHEME --build-arg scheme=$SCHEME .
-      - name: Test
+      - name: Simple Test
         run: |
            docker run --rm parigp-$SCHEME gp --version
-      - name: Deploy
+      - name: Deploy to Docker
         if: github.ref == 'refs/heads/master'
         run: |
-           #DOCKER_TAG="mastermic/parigp-$SCHEME"
-           GH_TAG="docker.pkg.github.com/mastermic/pari-docker/parigp-$SCHEME"
-           #VERSION="$(date "+%Y%m%d")"
+           DOCKER_TAG="pascalmolin/parigp-$SCHEME"
            #docker tag parigp-$SCHEME ${DOCKER_TAG}:$VERSION
-           #docker tag parigp-$SCHEME ${DOCKER_TAG}:latest
-           #docker tag parigp-$SCHEME ${GH_TAG}:$VERSION
-           
+           docker tag parigp-$SCHEME ${DOCKER_TAG}:latest
+           docker images $DOCKER_TAG
+           echo "$DOCKER_HUB_TOKEN" | docker login --password-stdin --username pascalmolin
+           docker push $DOCKER_TAG
+        env:
+           DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+      - name: Deploy to Github
+        if: github.ref == 'refs/heads/master'
+        run: |
+           GH_TAG="docker.pkg.github.com/mastermic/pari-docker/parigp-$SCHEME"
            docker tag parigp-$SCHEME ${GH_TAG}:latest
            docker images # $DOCKER_TAG
-
            echo "$GITHUB_TOKEN" | docker login docker.pkg.github.com --password-stdin --username pascalmolin
            docker push $GH_TAG
-           #echo "$DOCKER_HUB_TOKEN" | docker login --password-stdin -u #pascalmolin
-           #docker push $DOCKER_TAG
         env:
-           #DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

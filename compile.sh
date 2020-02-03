@@ -1,4 +1,4 @@
-#set -e
+set -e
 scheme="$1"
 VERSION="2.11.2"
 TAR="pari-$VERSION.tar.gz"
