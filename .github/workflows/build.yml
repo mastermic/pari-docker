@@ -28,7 +28,8 @@ jobs:
            docker tag parigp-$SCHEME ${DOCKER_TAG}:latest
            docker images $DOCKER_TAG
            echo "$DOCKER_HUB_TOKEN" | docker login --password-stdin --username pascalmolin
-           docker push $DOCKER_TAG
+           docker push ${DOCKER_TAG}:${VERSION}
+           docker push ${DOCKER_TAG}:latest
         env:
            DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
       - name: Deploy to Github
@@ -40,6 +41,6 @@ jobs:
            docker tag parigp-$SCHEME ${GH_TAG}:${VERSION}
            docker images # $DOCKER_TAG
            echo "$GITHUB_TOKEN" | docker login docker.pkg.github.com --password-stdin --username pascalmolin
-           docker push $GH_TAG
+           docker push -a $GH_TAG
         env:
            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
