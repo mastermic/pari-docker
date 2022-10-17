@@ -1,9 +1,11 @@
 set -e
 scheme="$1" #
-VERSION="2.15.0"
+VERSION="$(cat VERSION)"
+MD5="$(cat MD5)"
 TAR="pari-$VERSION.tar.gz"
 URL="https://pari.math.u-bordeaux.fr/pub/pari/unix/$TAR"
-MD5="76d430f1bea1b07fa2ad9712deeaa736"
+
+echo "==> Build Pari/GP $VERSION"
 
 echo "==> Install system packages"
 apk --no-cache add build-base gmp-dev readline-dev tar wget
